@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Decision Support System — PT Pembangunan Jaya Ancol</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#060F1E;--navy2:#0C1D36;--navy3:#142645;
+  --blue:#1A5FE0;--blue2:#2B73F5;--cyan:#00C9E8;
+  --white:#F4F8FF;--white2:#E8EEFA;--gray:#7A8FAD;--gray2:#4A5A72;
+  --green:#00D49C;--orange:#FF8940;--red:#FF4D6A;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+}
+html{scroll-behavior:smooth}
+body{background:var(--navy);color:var(--white);font-family:'Instrument Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(26,95,224,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(26,95,224,0.04) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0}
+.wrap{max-width:860px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+
+/* HEADER */
+header{padding:28px 0 0;border-bottom:1px solid var(--border);padding-bottom:20px;margin-bottom:40px}
+.header-inner{display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-mark{width:36px;height:36px;background:linear-gradient(135deg,var(--blue),var(--cyan));border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:white}
+.logo-text{font-family:'Syne',sans-serif;font-weight:600;font-size:14px;color:var(--white2)}
+.logo-sub{font-size:11px;color:var(--gray);margin-top:1px}
+.status-pill{display:flex;align-items:center;gap:6px;background:rgba(0,212,156,0.08);border:1px solid rgba(0,212,156,0.2);border-radius:20px;padding:5px 12px;font-size:12px;color:var(--green);font-weight:500}
+.status-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+
+/* HERO */
+.hero{text-align:center;margin-bottom:40px}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(26,95,224,0.1);border:1px solid rgba(26,95,224,0.25);border-radius:20px;padding:5px 14px;font-size:12px;color:#6AA3FF;font-weight:500;letter-spacing:.5px;text-transform:uppercase;margin-bottom:16px}
+h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(26px,4vw,42px);line-height:1.1;letter-spacing:-1px;margin-bottom:12px;background:linear-gradient(135deg,var(--white) 0%,var(--white2) 50%,#7AA8E0 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:15px;color:var(--gray);max-width:480px;margin:0 auto;line-height:1.6}
+
+/* TYPE SELECTOR */
+.type-section{margin-bottom:24px}
+.section-label{font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--gray);font-weight:500;margin-bottom:10px}
+.type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.type-option{position:relative}
+.type-option input[type="radio"]{position:absolute;opacity:0;width:0;height:0}
+.type-label{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:14px 8px;background:var(--navy2);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all .15s;text-align:center}
+.type-label:hover{border-color:var(--border2);background:rgba(26,95,224,0.06)}
+.type-option input:checked+.type-label{background:rgba(26,95,224,0.12);border-color:rgba(43,115,245,0.5)}
+.type-icon{font-size:20px;line-height:1}
+.type-name{font-size:11px;font-weight:500;color:var(--white2)}
+.type-option input:checked+.type-label .type-name{color:#6AA3FF}
+.type-webhook{font-family:'DM Mono',monospace;font-size:9px;color:var(--gray);margin-top:2px}
+
+/* FORM */
+.form-card{background:var(--navy2);border:1px solid var(--border2);border-radius:16px;overflow:hidden;margin-bottom:20px}
+.form-card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.form-card-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;background:rgba(26,95,224,0.15)}
+.form-card-title{font-family:'Syne',sans-serif;font-weight:600;font-size:14px}
+.form-card-body{padding:20px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.form-group{margin-bottom:14px}
+.form-group:last-child{margin-bottom:0}
+label{display:block;font-size:11px;font-weight:500;color:var(--gray);margin-bottom:6px;text-transform:uppercase;letter-spacing:.6px}
+input[type="text"],input[type="email"],select,textarea{width:100%;background:var(--navy3);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;color:var(--white);font-family:'Instrument Sans',sans-serif;font-size:13px;outline:none;transition:border-color .15s;appearance:none}
+input:focus,select:focus,textarea:focus{border-color:var(--blue2);box-shadow:0 0 0 3px rgba(43,115,245,0.12)}
+input::placeholder,textarea::placeholder{color:var(--gray2)}
+select{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237A8FAD' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+select option{background:var(--navy2)}
+textarea{resize:vertical;min-height:160px;font-family:'DM Mono',monospace;font-size:12px;line-height:1.6}
+
+/* WEBHOOK URL DISPLAY */
+.webhook-display{background:var(--navy3);border:1px solid var(--border);border-radius:8px;padding:8px 12px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.webhook-method{font-size:10px;font-weight:700;color:var(--green);background:rgba(0,212,156,0.1);border:1px solid rgba(0,212,156,0.2);border-radius:4px;padding:2px 6px}
+.webhook-url{font-family:'DM Mono',monospace;font-size:11px;color:var(--cyan);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* SUBMIT */
+.btn-submit{width:100%;background:linear-gradient(135deg,var(--blue) 0%,var(--blue2) 100%);border:none;border-radius:10px;padding:13px 24px;color:white;font-family:'Syne',sans-serif;font-weight:600;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s;margin-bottom:16px}
+.btn-submit:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(26,95,224,0.35)}
+.btn-submit:active{transform:translateY(0)}
+.btn-submit:disabled{opacity:.6;cursor:not-allowed;transform:none;box-shadow:none}
+.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .8s linear infinite;display:none}
+.btn-submit.loading .spinner{display:block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* LOADING */
+.loading-steps{display:none;flex-direction:column;gap:6px;padding:8px 0 16px}
+.loading-steps.visible{display:flex}
+.step-item{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--gray);transition:color .3s}
+.step-item.active{color:var(--cyan)}
+.step-item.done{color:var(--green)}
+.step-dot{width:5px;height:5px;border-radius:50%;background:var(--gray2);flex-shrink:0;transition:background .3s}
+.step-item.active .step-dot{background:var(--cyan);box-shadow:0 0 6px var(--cyan);animation:blink 1s infinite}
+.step-item.done .step-dot{background:var(--green)}
+
+/* RESULT */
+#result-panel{display:none;background:var(--navy2);border:1px solid var(--border2);border-radius:16px;overflow:hidden;margin-bottom:24px;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.result-header{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.result-status{display:flex;align-items:center;gap:8px;font-family:'Syne',sans-serif;font-weight:600;font-size:14px}
+.result-status.success{color:var(--green)}
+.result-status.error{color:var(--red)}
+.result-meta{font-size:11px;color:var(--gray);font-family:'DM Mono',monospace}
+.result-body{padding:16px 20px}
+.result-pre{background:var(--navy3);border:1px solid var(--border);border-radius:8px;padding:14px;font-family:'DM Mono',monospace;font-size:11.5px;color:#A8C8FF;white-space:pre-wrap;word-break:break-word;line-height:1.7}
+.result-pre::-webkit-scrollbar{width:4px}
+.result-pre::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+footer{padding:28px 0;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--gray2)}
+.footer-brand{font-family:'Syne',sans-serif;font-weight:600;font-size:12px;color:var(--gray)}
+
+@media(max-width:640px){.form-row{grid-template-columns:1fr}.type-grid{grid-template-columns:repeat(2,1fr)}h1{font-size:26px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-mark">G</div>
+      <div>
+        <div class="logo-text">PT Galactic Indonesia Perkasa</div>
+        <div class="logo-sub">gip.co.id · AI Decision Support System</div>
+      </div>
+    </div>
+    <div class="status-pill"><div class="status-dot"></div>System Online</div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-badge">✦ Powered by Google Gemini</div>
+  <h1>AI Decision Support<br>System — PJAA</h1>
+  <p class="hero-sub">Otomasi review dokumen Business Judgement Rule, analisis risiko, dan validasi kepatuhan GCG untuk Direksi PT Pembangunan Jaya Ancol Tbk.</p>
+</section>
+
+<!-- Type Selector -->
+<div class="type-section">
+  <div class="section-label">Pilih Tipe Analisis</div>
+  <div class="type-grid">
+    <div class="type-option">
+      <input type="radio" name="req-type" id="t-bjr" value="bjr-review" checked>
+      <label class="type-label" for="t-bjr">
+        <div class="type-icon">⚖️</div>
+        <div class="type-name">BJR Review</div>
+        <div class="type-webhook">/bjr-review</div>
+      </label>
+    </div>
+    <div class="type-option">
+      <input type="radio" name="req-type" id="t-draft" value="document-drafting">
+      <label class="type-label" for="t-draft">
+        <div class="type-icon">📝</div>
+        <div class="type-name">Drafting</div>
+        <div class="type-webhook">/document-drafting</div>
+      </label>
+    </div>
+    <div class="type-option">
+      <input type="radio" name="req-type" id="t-risk" value="risk-analysis">
+      <label class="type-label" for="t-risk">
+        <div class="type-icon">⚠️</div>
+        <div class="type-name">Risk Analysis</div>
+        <div class="type-webhook">/risk-analysis</div>
+      </label>
+    </div>
+    <div class="type-option">
+      <input type="radio" name="req-type" id="t-comp" value="compliance">
+      <label class="type-label" for="t-comp">
+        <div class="type-icon">✅</div>
+        <div class="type-name">Compliance</div>
+        <div class="type-webhook">/compliance</div>
+      </label>
+    </div>
+    <div class="type-option">
+      <input type="radio" name="req-type" id="t-kb" value="knowledge-base">
+      <label class="type-label" for="t-kb">
+        <div class="type-icon">🧠</div>
+        <div class="type-name">Knowledge Base</div>
+        <div class="type-webhook">/knowledge-base</div>
+      </label>
+    </div>
+    <div class="type-option">
+      <input type="radio" name="req-type" id="t-qr" value="quality-review">
+      <label class="type-label" for="t-qr">
+        <div class="type-icon">🔍</div>
+        <div class="type-name">Quality Review</div>
+        <div class="type-webhook">/quality-review</div>
+      </label>
+    </div>
+  </div>
+</div>
+
+<!-- Form -->
+<div class="form-card">
+  <div class="form-card-header">
+    <div class="form-card-icon">📋</div>
+    <div class="form-card-title">Submit Dokumen untuk Dianalisis</div>
+  </div>
+  <div class="form-card-body">
+
+    <!-- Webhook URL display -->
+    <div class="webhook-display">
+      <span class="webhook-method">POST</span>
+      <span class="webhook-url" id="webhook-display">https://n8n-1e7mzme8cxf7.jkt5.sumopod.my.id/webhook/bjr-review</span>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Email User</label>
+        <input type="email" id="user-email" placeholder="nama@ancol.co.id">
+      </div>
+      <div class="form-group">
+        <label>Role / Jabatan</label>
+        <select id="user-role">
+          <option value="direksi">Direksi</option>
+          <option value="division_head">Division Head</option>
+          <option value="manager" selected>Manager</option>
+          <option value="staff">Staff</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group" id="doc-type-group" style="display:none">
+      <label>Jenis Dokumen (untuk Drafting)</label>
+      <select id="doc-type">
+        <option value="bjr_memo">BJR Memo</option>
+        <option value="risk_assessment">Risk Assessment</option>
+        <option value="executive_summary">Executive Summary</option>
+        <option value="risalah_rapat">Risalah Rapat</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <label style="margin-bottom:0">Konten Dokumen</label>
+        <label for="file-upload" style="display:flex;align-items:center;gap:5px;cursor:pointer;background:rgba(26,95,224,0.1);border:1px solid rgba(43,115,245,0.3);border-radius:6px;padding:4px 10px;font-size:11px;color:#6AA3FF;font-weight:500;text-transform:uppercase;letter-spacing:.5px;transition:all .15s;" onmouseover="this.style.background='rgba(26,95,224,0.2)'" onmouseout="this.style.background='rgba(26,95,224,0.1)'">
+          <span>📎</span> Upload File
+        </label>
+        <input type="file" id="file-upload" accept=".txt,.pdf,.docx" style="display:none" onchange="handleFileUpload(event)">
+      </div>
+      <div id="file-info" style="display:none;background:rgba(0,212,156,0.08);border:1px solid rgba(0,212,156,0.2);border-radius:6px;padding:6px 10px;margin-bottom:8px;font-size:11px;color:var(--green);display:flex;align-items:center;gap:6px;">
+        <span>📄</span><span id="file-name"></span>
+        <span onclick="clearFile()" style="margin-left:auto;cursor:pointer;color:var(--gray);font-size:14px;line-height:1;">×</span>
+      </div>
+      <textarea id="doc-content" placeholder="Paste konten dokumen BJR, kajian bisnis, proposal, atau pertanyaan untuk knowledge base...&#10;&#10;Atau klik Upload File untuk upload .txt / .pdf / .docx"></textarea>
+    </div>
+
+  </div>
+</div>
+
+<button class="btn-submit" id="submit-btn" onclick="submitForm()">
+  <div class="spinner"></div>
+  <span id="btn-text">⚡ Analisis dengan AI</span>
+</button>
+
+<div class="loading-steps" id="loading-steps">
+  <div class="step-item" id="s1"><div class="step-dot"></div>Mengirim dokumen ke agen AI...</div>
+  <div class="step-item" id="s2"><div class="step-dot"></div>Gemini 2.5 Flash memproses...</div>
+  <div class="step-item" id="s3"><div class="step-dot"></div>Menyusun laporan analisis...</div>
+</div>
+
+<div id="result-panel">
+  <div class="result-header">
+    <div class="result-status" id="result-status">
+      <span id="result-icon">✅</span>
+      <span id="result-title">Analisis Selesai</span>
+    </div>
+    <div class="result-meta" id="result-meta"></div>
+  </div>
+  <div class="result-body">
+    <pre class="result-pre" id="result-content"></pre>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-brand">PT Galactic Indonesia Perkasa</div>
+  <div>AI DSS v1.0 · Powered by Google Gemini</div>
+</footer>
+
+</div>
+
+<script>
+const N8N_BASE = 'https://n8n-1e7mzme8cxf7.jkt5.sumopod.my.id/webhook';
+
+const WEBHOOK_MAP = {
+  'bjr-review':       { url: N8N_BASE + '/bjr-review',       payload: (d) => ({ documentContent: d.content, sessionId: sid(), userRole: d.role }) },
+  'document-drafting':{ url: N8N_BASE + '/document-drafting', payload: (d) => ({ documentContent: d.content, documentType: d.docType, sessionId: sid(), userRole: d.role }) },
+  'risk-analysis':    { url: N8N_BASE + '/risk-analysis',     payload: (d) => ({ documentContent: d.content, sessionId: sid(), userRole: d.role }) },
+  'compliance':       { url: N8N_BASE + '/compliance',        payload: (d) => ({ documentContent: d.content, sessionId: sid(), userRole: d.role }) },
+  'knowledge-base':   { url: N8N_BASE + '/knowledge-base',    payload: (d) => ({ query: d.content, mode: 'query', sessionId: sid(), userRole: d.role }) },
+  'quality-review':   { url: N8N_BASE + '/quality-review',    payload: (d) => ({ documentContent: d.content, sessionId: sid(), userRole: d.role }) },
+};
+
+function sid() { return 'demo_' + Math.random().toString(36).substr(2,8) + '_' + Date.now(); }
+
+// Update webhook URL display when type changes
+document.querySelectorAll('input[name="req-type"]').forEach(r => {
+  r.addEventListener('change', () => {
+    const cfg = WEBHOOK_MAP[r.value];
+    document.getElementById('webhook-display').textContent = cfg.url;
+    document.getElementById('doc-type-group').style.display = r.value === 'document-drafting' ? 'block' : 'none';
+  });
+});
+
+const steps = ['s1','s2','s3'];
+
+function animateSteps() {
+  let i = 0;
+  document.getElementById('loading-steps').classList.add('visible');
+  steps.forEach(s => document.getElementById(s).className = 'step-item');
+  return setInterval(() => {
+    if (i > 0) document.getElementById(steps[i-1]).className = 'step-item done';
+    if (i < steps.length) { document.getElementById(steps[i]).className = 'step-item active'; i++; }
+  }, 3000);
+}
+
+async function submitForm() {
+  const reqType = document.querySelector('input[name="req-type"]:checked').value;
+  const content = document.getElementById('doc-content').value.trim();
+  const role    = document.getElementById('user-role').value;
+  const docType = document.getElementById('doc-type').value;
+
+  if (!content) { showResult('error', '❌ Konten kosong', '', 'Paste konten dokumen yang ingin dianalisis.'); return; }
+
+  const cfg = WEBHOOK_MAP[reqType];
+  const payload = cfg.payload({ content, role, docType });
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.classList.add('loading');
+  document.getElementById('btn-text').textContent = 'Memproses...';
+  document.getElementById('result-panel').style.display = 'none';
+
+  const start = Date.now();
+  const stepInterval = animateSteps();
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 120000);
+
+    const res = await fetch(cfg.url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+
+    const elapsed = ((Date.now() - start) / 1000).toFixed(1);
+    steps.forEach(s => document.getElementById(s).className = 'step-item done');
+
+    if (res.ok) {
+      let data;
+      try { data = await res.json(); } catch(e) { data = await res.text(); }
+      const text = typeof data === 'string' ? data : (data.aiResponse || JSON.stringify(data, null, 2));
+      showResult('success', '✅ Analisis Selesai', elapsed + 's · ' + res.status, text);
+    } else {
+      const err = await res.text();
+      showResult('error', '❌ Error dari Server', elapsed + 's · HTTP ' + res.status, err);
+    }
+  } catch(err) {
+    const elapsed = ((Date.now() - start) / 1000).toFixed(1);
+    steps.forEach(s => document.getElementById(s).className = 'step-item');
+    if (err.name === 'AbortError') {
+      showResult('error', '⏱️ Timeout', elapsed + 's', 'Request melebihi 120 detik. Coba lagi atau periksa n8n execution log.');
+    } else {
+      showResult('error', '❌ Connection Error', elapsed + 's', err.message + '\n\nPastikan workflow sudah Published di n8n.');
+    }
+  } finally {
+    clearInterval(stepInterval);
+    btn.disabled = false;
+    btn.classList.remove('loading');
+    document.getElementById('btn-text').textContent = '⚡ Analisis dengan AI';
+    setTimeout(() => document.getElementById('loading-steps').classList.remove('visible'), 2000);
+  }
+}
+
+async function handleFileUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const fileInfo = document.getElementById('file-info');
+  const fileName = document.getElementById('file-name');
+  const textarea = document.getElementById('doc-content');
+  const ext = file.name.split('.').pop().toLowerCase();
+
+  fileName.textContent = file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB) — Memproses...';
+  fileInfo.style.display = 'flex';
+  textarea.value = '';
+
+  try {
+    if (ext === 'txt') {
+      const text = await file.text();
+      textarea.value = text;
+      fileName.textContent = file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB) ✓';
+
+    } else if (ext === 'pdf') {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      let fullText = '';
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items.map(item => item.str).join(' ');
+        fullText += pageText + '
+
+';
+      }
+      textarea.value = fullText.trim();
+      fileName.textContent = file.name + ' (' + pdf.numPages + ' halaman) ✓';
+
+    } else if (ext === 'docx') {
+      const arrayBuffer = await file.arrayBuffer();
+      const result = await mammoth.extractRawText({ arrayBuffer });
+      textarea.value = result.value.trim();
+      fileName.textContent = file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB) ✓';
+
+    } else {
+      fileName.textContent = file.name + ' — Format tidak didukung (.txt, .pdf, .docx only)';
+    }
+  } catch(err) {
+    fileName.textContent = file.name + ' — Gagal memproses: ' + err.message;
+    console.error('File parse error:', err);
+  }
+
+  event.target.value = '';
+}
+
+function clearFile() {
+  document.getElementById('file-info').style.display = 'none';
+  document.getElementById('file-name').textContent = '';
+}
+
+function showResult(type, title, meta, content) {
+  const panel = document.getElementById('result-panel');
+  document.getElementById('result-status').className = 'result-status ' + type;
+  document.getElementById('result-icon').textContent = title.split(' ')[0];
+  document.getElementById('result-title').textContent = title.replace(/^[^\s]+\s/, '');
+  document.getElementById('result-meta').textContent = meta;
+  document.getElementById('result-content').textContent = content || '';
+  panel.style.display = 'block';
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+</script>
+</body>
+</html>
